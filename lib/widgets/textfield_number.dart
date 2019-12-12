@@ -1,27 +1,29 @@
 import 'package:flutter/material.dart';
 
-class MyTextFieldNumber extends StatefulWidget {
+class MyTextField extends StatefulWidget {
 
   final double height;
   final String labelText;
   final FocusNode focusNode;
   final FocusNode nextFocus;
   final TextEditingController controller;
+  final TextInputType textInputType;
 
-  MyTextFieldNumber({
+  MyTextField({
     Key key,
     this.height,
     this.labelText,
     this.focusNode,
     this.nextFocus,
-    this.controller
+    this.controller,
+    this.textInputType,
   }) : super(key: key);
 
   @override
-  MyTextFieldNumberState createState() => new MyTextFieldNumberState();
+  _MyTextFieldState createState() => new _MyTextFieldState();
 }
 
-class MyTextFieldNumberState extends State<MyTextFieldNumber> {
+class _MyTextFieldState extends State<MyTextField> {
   @override
   Widget build(BuildContext context) {
     return Flexible( 
@@ -30,7 +32,7 @@ class MyTextFieldNumberState extends State<MyTextFieldNumber> {
         child: TextField(
           controller: widget.controller,
           focusNode: widget.focusNode,
-          keyboardType: TextInputType.number,
+          keyboardType: widget.textInputType,
           decoration: InputDecoration(
             border: OutlineInputBorder(),
             labelText: widget.labelText,
