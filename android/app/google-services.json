@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "902494262377",
+    "firebase_url": "https://chatarrera-1e479.firebaseio.com",
+    "project_id": "chatarrera-1e479",
+    "storage_bucket": "chatarrera-1e479.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:902494262377:android:0ca35d765eb9d271a27ef8",
+        "android_client_info": {
+          "package_name": "com.mundo.chatarrera_flutter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "902494262377-g9f8kb3ob192l3hbv3tll8mttb1jtuqd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAELRnTbNpX0ocsnUSIlmkWbZbSDOcdmQ4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "902494262377-g9f8kb3ob192l3hbv3tll8mttb1jtuqd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
