@@ -1,3 +1,5 @@
+import 'package:chatarrera_flutter/models/Material.dart';
+import 'package:chatarrera_flutter/tabs/materiales/card_material.dart';
 import 'package:chatarrera_flutter/widgets/decorations.dart';
 import 'package:chatarrera_flutter/widgets/textfield_number.dart';
 import 'package:flutter/material.dart';
@@ -26,7 +28,32 @@ class _MaterialesWidgetState extends State<MaterialesWidget> {
     return Expanded(
       child: Container(
         child: TreeView(
-          parentList: [],
+          parentList: [
+            Parent(
+              parent: CardMaterial(
+                material: MaterialC(
+                  nombre: 'Aluminio',
+                  precio: 24.5,
+                ),
+              ),
+              childList: ChildList(
+                children: <Widget>[
+                  Parent(
+                    parent: Text('documents'),
+                    childList: ChildList(
+                      children: <Widget>[
+                        Text('Resume.docx'),
+                        Text('Billing-Info.docx'),
+                      ],
+                    ),
+                  ),
+                  Text('MeetingReport.xls'),
+                  Text('MeetingReport.pdf'),
+                  Text('Demo.zip'),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -63,8 +90,17 @@ class _MaterialesWidgetState extends State<MaterialesWidget> {
             focusNode: this.textPrecioFocus,
             // nextFocus: this.textPagadoFocus,
           ),
+          IconButton(
+            icon: Icon(Icons.done),
+            tooltip: "Aceptar",
+            onPressed: onPressAceptar,
+          ),
         ],
       ),
     );
   }
+}
+
+void onPressAceptar() {
+
 }

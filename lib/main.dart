@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:chatarrera_flutter/tabs/salidas.dart';
-import 'package:chatarrera_flutter/tabs/materiales.dart';
+import 'package:chatarrera_flutter/tabs/salidas/salidas.dart';
+import 'package:chatarrera_flutter/tabs/materiales/materiales.dart';
 import 'package:chatarrera_flutter/tabs/entradas/entradas.dart';
 
 void main() {
