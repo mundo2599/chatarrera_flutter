@@ -1,4 +1,5 @@
 import 'package:chatarrera_flutter/models/Material.dart';
+import 'package:chatarrera_flutter/services/firestore_materiales.dart';
 import 'package:chatarrera_flutter/tabs/materiales/card_material.dart';
 import 'package:chatarrera_flutter/widgets/decorations.dart';
 import 'package:chatarrera_flutter/widgets/textfield_number.dart';
@@ -14,13 +15,26 @@ class _MaterialesWidgetState extends State<MaterialesWidget> {
   double padding = 5.0;
   double inputHeight = 45;
 
+  List<MaterialC> materiales;
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        treeViewMateriales(),
-        inputs(),
-      ],
+    return FutureBuilder(
+      future: this.obtenerMateriales(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          return Column(
+            children: <Widget>[
+              treeViewMateriales(),
+              inputs(),
+            ],
+          );
+        } else {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+      },
     );
   }
 
@@ -28,32 +42,27 @@ class _MaterialesWidgetState extends State<MaterialesWidget> {
     return Expanded(
       child: Container(
         child: TreeView(
-          parentList: [
-            Parent(
-              parent: CardMaterial(
-                material: MaterialC(
-                  nombre: 'Aluminio',
-                  precio: 24.5,
+          parentList: materiales.map<Parent>(
+            (materialPadre) {
+              return Parent(
+                parent: CardMaterial(
+                  material: materialPadre,
                 ),
-              ),
-              childList: ChildList(
-                children: <Widget>[
-                  Parent(
-                    parent: Text('documents'),
-                    childList: ChildList(
-                      children: <Widget>[
-                        Text('Resume.docx'),
-                        Text('Billing-Info.docx'),
-                      ],
-                    ),
-                  ),
-                  Text('MeetingReport.xls'),
-                  Text('MeetingReport.pdf'),
-                  Text('Demo.zip'),
-                ],
-              ),
-            ),
-          ],
+                childList: ChildList(
+                  children: materialPadre.hijos.map<Widget>(
+                    (materialHijo) {
+                      return Container(
+                        margin: const EdgeInsets.only(left: 4.0),
+                        child: CardMaterial(
+                          material: materialHijo,
+                        ),
+                      );
+                    },
+                  ).toList(),
+                ),
+              );
+            },
+          ).toList(),
         ),
       ),
     );
@@ -65,6 +74,7 @@ class _MaterialesWidgetState extends State<MaterialesWidget> {
   FocusNode textPrecioFocus = FocusNode();
   TextEditingController textNombreController = new TextEditingController();
   TextEditingController textPrecioController = new TextEditingController();
+
   Widget inputs() {
     return Container(
       decoration: BoxDecoration(border: borderGris(top: true, bottom: true)),
@@ -99,8 +109,38 @@ class _MaterialesWidgetState extends State<MaterialesWidget> {
       ),
     );
   }
-}
 
-void onPressAceptar() {
+  void onPressAceptar() {
+    MaterialC material = MaterialC();
+    if (this.textNombreController.text != '') {
+      material.nombre = this.textNombreController.text;
+    } else {
+      print('campo vacio');
+      return;
+    }
+    try {
+      material.precio = double.parse(this.textPrecioController.text);
+    } catch (e) {
+      print('formato de numero incorrecto');
+      return;
+    }
 
+    FirestoreMateriales.addMaterial(material).then((_) {
+      this.textNombreController.clear();
+      this.textPrecioController.clear();
+      setState(() {
+        materiales.add(material);
+      });
+    });
+  }
+
+  Future<void> obtenerMateriales() async {
+    if (materiales == null) {
+      await FirestoreMateriales.getMateriales().then((materiales) {
+        this.materiales = materiales;
+      }).catchError((onError) {
+        print('error al obtener materiales :C');
+      });
+    }
+  }
 }

@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:chatarrera_flutter/widgets/textfield_number.dart';
 import 'package:chatarrera_flutter/models/Material.dart';
 import 'package:chatarrera_flutter/widgets/dropdown.dart';
-import 'package:chatarrera_flutter/services/firestore_materiales_service.dart';
+import 'package:chatarrera_flutter/services/firestore_materiales.dart';
 
 class EntradasWidget extends StatefulWidget {
   @override
@@ -45,16 +45,13 @@ class _EntradasWidgetState extends State<EntradasWidget>
 
   DateTime valueDate = DateTime.now();
 
-  FirestoreMaterialesService materialesService =
-      new FirestoreMaterialesService();
-
   //by default it will be null, change it to true.
   @override
   bool get wantKeepAlive => true;
 
   @override
   void initState() {
-    materialesService.getMateriales().then((results) {
+    FirestoreMateriales.getMateriales().then((results) {
       setState(() {
         materiales = results;
       });
@@ -292,5 +289,4 @@ class _EntradasWidgetState extends State<EntradasWidget>
   void limpiarInputs() {
     // TODO: Limpiar inputs de precio material etc
   }
-
 }
