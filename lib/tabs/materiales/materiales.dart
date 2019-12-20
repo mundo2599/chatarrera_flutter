@@ -17,6 +17,9 @@ class _MaterialesWidgetState extends State<MaterialesWidget> {
 
   List<MaterialC> materiales;
 
+  String accionInputs = '';
+  bool inputsVisibles = false;
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -47,6 +50,8 @@ class _MaterialesWidgetState extends State<MaterialesWidget> {
               return Parent(
                 parent: CardMaterial(
                   material: materialPadre,
+                  isChild: false,
+                  onPressAdd: this.onPressAddInMaterial,
                 ),
                 childList: ChildList(
                   children: materialPadre.hijos.map<Widget>(
@@ -55,6 +60,7 @@ class _MaterialesWidgetState extends State<MaterialesWidget> {
                         margin: const EdgeInsets.only(left: 4.0),
                         child: CardMaterial(
                           material: materialHijo,
+                          isChild: true,
                         ),
                       );
                     },
@@ -76,38 +82,47 @@ class _MaterialesWidgetState extends State<MaterialesWidget> {
   TextEditingController textPrecioController = new TextEditingController();
 
   Widget inputs() {
-    return Container(
-      decoration: BoxDecoration(border: borderGris(top: true, bottom: true)),
-      padding: EdgeInsets.all(padding),
-      child: Row(
-        children: <Widget>[
-          MyTextField(
-            textInputType: TextInputType.text,
-            controller: this.textNombreController,
-            key: this.textFieldNombreKey,
-            labelText: 'Nombre',
-            height: inputHeight,
-            focusNode: this.textNombreFocus,
-            nextFocus: this.textPrecioFocus,
-          ),
-          SizedBox(width: padding), // Espacio entre inputs
-          MyTextField(
-            textInputType: TextInputType.number,
-            controller: this.textPrecioController,
-            key: this.textFieldPrecioKey,
-            labelText: 'Precio',
-            height: inputHeight,
-            focusNode: this.textPrecioFocus,
-            // nextFocus: this.textPagadoFocus,
-          ),
-          IconButton(
-            icon: Icon(Icons.done),
-            tooltip: "Aceptar",
-            onPressed: onPressAceptar,
-          ),
-        ],
-      ),
-    );
+    if (this.inputsVisibles)
+      return Container(
+        decoration: BoxDecoration(border: borderGris(top: true, bottom: true)),
+        padding: EdgeInsets.all(padding),
+        child: Row(
+          children: <Widget>[
+            MyTextField(
+              textInputType: TextInputType.text,
+              controller: this.textNombreController,
+              key: this.textFieldNombreKey,
+              labelText: 'Nombre',
+              height: inputHeight,
+              focusNode: this.textNombreFocus,
+              nextFocus: this.textPrecioFocus,
+            ),
+            SizedBox(width: padding), // Espacio entre inputs
+            MyTextField(
+              textInputType: TextInputType.number,
+              controller: this.textPrecioController,
+              key: this.textFieldPrecioKey,
+              labelText: 'Precio',
+              height: inputHeight,
+              focusNode: this.textPrecioFocus,
+              // nextFocus: this.textPagadoFocus,
+            ),
+            IconButton(
+              icon: Icon(Icons.done),
+              tooltip: "Aceptar",
+              onPressed: onPressAceptar,
+            ),
+            IconButton(
+              icon: Icon(Icons.cancel),
+              tooltip: "Cancelar",
+              onPressed: onPressCancelar,
+              color: Colors.red,
+            ),
+          ],
+        ),
+      );
+    else
+      return Container();
   }
 
   void onPressAceptar() {
@@ -134,6 +149,14 @@ class _MaterialesWidgetState extends State<MaterialesWidget> {
     });
   }
 
+  void onPressCancelar() {
+    setState(() {
+      this.inputsVisibles = false;
+    });
+    this.textNombreController.clear();
+    this.textPrecioController.clear();
+  }
+
   Future<void> obtenerMateriales() async {
     if (materiales == null) {
       await FirestoreMateriales.getMateriales().then((materiales) {
@@ -142,5 +165,13 @@ class _MaterialesWidgetState extends State<MaterialesWidget> {
         print('error al obtener materiales :C');
       });
     }
+  }
+
+  void onPressAddInMaterial(CardMaterial cardPresionado) {
+    MaterialC materialPadre = cardPresionado.material;
+    setState(() {
+      this.inputsVisibles = true;
+      this.accionInputs = 'Submaterial de ' + materialPadre.nombre;
+    });
   }
 }
