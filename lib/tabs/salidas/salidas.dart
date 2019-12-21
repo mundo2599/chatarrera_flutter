@@ -8,10 +8,14 @@ class SalidasWidget extends StatefulWidget {
 class _SalidasWidgetState extends State<SalidasWidget> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Center(
-        child: Text('Salidas')
-      )
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Salidas"),
+        backgroundColor: Colors.grey,
+      ),
+      body: Container(
+        child: Center(child: Text('Salidas')),
+      ),
     );
   }
 }

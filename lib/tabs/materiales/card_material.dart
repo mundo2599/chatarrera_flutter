@@ -85,17 +85,17 @@ class _CardMaterialState extends State<CardMaterial> {
         // direction: Axis.horizontal,
         children: <Widget>[
           InkResponse(
-            onTap: () => widget.onPressEdit(this.widget),
-            child: Icon(
-              Icons.edit,
-              size: iconSize,
-              // color: Colors.black,
-            ),
-          ),
-          InkResponse(
             onTap: () => widget.onPressAdd(this.widget),
             child: Icon(
               Icons.add,
+              size: iconSize,
+              color: widget.isChild ? Colors.white : Colors.black,
+            ),
+          ),
+          InkResponse(
+            onTap: () => widget.onPressEdit(this.widget),
+            child: Icon(
+              Icons.edit,
               size: iconSize,
               // color: Colors.black,
             ),

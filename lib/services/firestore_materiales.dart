@@ -8,8 +8,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class FirestoreMateriales {
   static CollectionReference materialesRef = FirestoreCollections.materiales;
 
-  // TODO: Que es lo mas conveniente regresar en metodos?
-
   static Future<void> addMaterial(MaterialC material) async {
     return materialesRef.add(material.toMap());
   }
@@ -19,19 +17,31 @@ class FirestoreMateriales {
   }
 
   static Future<List<MaterialC>> getMateriales() async {
-    var completer = new Completer<List<MaterialC>>();
-    await materialesRef.orderBy("nombre").getDocuments().then(
+    List<MaterialC> materialesPadres = <MaterialC>[];
+    List<MaterialC> materialesHijos = <MaterialC>[];
+
+    return materialesRef.orderBy("nombre").getDocuments().then<List<MaterialC>>(
       (results) {
-        completer.complete(
-          results.documents
-              .map(
-                (value) => MaterialC.fromMap(value.data, value.documentID),
-              )
-              .toList(),
-        );
+        for (var document in results.documents) {
+          MaterialC material =
+              MaterialC.fromMap(document.data, document.documentID);
+          if (material.idPadre == null)
+            materialesPadres.add(material);
+          else
+            materialesHijos.add(material);
+        }
+
+        if (materialesHijos.length != 0) {
+          for (var materialPadre in materialesPadres) {
+            Iterable<MaterialC> hijos = materialesHijos.where(
+              (materialHijo) => materialHijo.idPadre == materialPadre.id,
+            );
+            materialPadre.hijos.addAll(hijos);
+          }
+        }
+
+        return materialesPadres;
       },
     );
-
-    return completer.future;
   }
 }

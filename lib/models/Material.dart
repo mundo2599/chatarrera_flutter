@@ -3,14 +3,14 @@ class MaterialC {
   String nombre;
   String idPadre;
   double precio;
-  List<MaterialC> hijos = [];
+  List<MaterialC> hijos = <MaterialC>[];
 
   MaterialC({
     this.id,
     this.nombre,
     this.precio,
     this.idPadre,
-    this.hijos = const [],
+    this.hijos = const <MaterialC>[],
   });
 
   MaterialC.fromMap(Map<String, dynamic> map, String id) {

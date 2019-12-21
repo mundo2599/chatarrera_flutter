@@ -5,11 +5,14 @@ import 'package:chatarrera_flutter/tabs/materiales/materiales.dart';
 import 'package:chatarrera_flutter/tabs/entradas/entradas.dart';
 
 void main() {
-  runApp(MaterialApp(
+  runApp(
+    MaterialApp(
       // Title
-      title: "Using Tabs",
+      title: "Chatarrera app",
       // Home
-      home: MyHome()));
+      home: MyHome(),
+    ),
+  );
 }
 
 class MyHome extends StatefulWidget {
@@ -18,12 +21,15 @@ class MyHome extends StatefulWidget {
 }
 
 class MyHomeState extends State<MyHome> {
-
   int currentIndex = 0;
-  final List<Widget> children = [MaterialesWidget(), EntradasWidget(), SalidasWidget()];
+  final List<Widget> children = [
+    MaterialesWidget(),
+    EntradasWidget(),
+    SalidasWidget()
+  ];
 
   final pageController = PageController();
-  
+
   @override
   void initState() {
     super.initState();
@@ -32,10 +38,6 @@ class MyHomeState extends State<MyHome> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Using Tabs"),
-        backgroundColor: Colors.grey,
-      ),
       body: PageView(
         children: this.children,
         controller: this.pageController,
@@ -43,7 +45,7 @@ class MyHomeState extends State<MyHome> {
       ),
       bottomNavigationBar: getNavBar(),
     );
-  }  
+  }
 
   void onPageChanged(int index) {
     setState(() {
@@ -61,16 +63,18 @@ class MyHomeState extends State<MyHome> {
       currentIndex: currentIndex,
       items: [
         BottomNavigationBarItem(
-            icon: Icon(Icons.work),
-            title: new Text('Materiales')),
+          icon: Icon(Icons.work),
+          title: new Text('Materiales'),
+        ),
         BottomNavigationBarItem(
-            icon: Icon(Icons.trending_down),
-            title: new Text('Entradas')),
+          icon: Icon(Icons.trending_down),
+          title: new Text('Entradas'),
+        ),
         BottomNavigationBarItem(
-            icon: Icon(Icons.trending_up),
-            title: new Text('Salidas')),
+          icon: Icon(Icons.trending_up),
+          title: new Text('Salidas'),
+        ),
       ],
     );
   }
-
 }

@@ -63,12 +63,18 @@ class _EntradasWidgetState extends State<EntradasWidget>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return Column(
-      children: <Widget>[
-        barraArriba(),
-        listViewEntradas(),
-        datosParaEntradas()
-      ],
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Entradas"),
+        backgroundColor: Colors.grey,
+      ),
+      body: Column(
+        children: <Widget>[
+          barraArriba(),
+          listViewEntradas(),
+          datosParaEntradas()
+        ],
+      ),
     );
   }
 
