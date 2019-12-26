@@ -3,43 +3,46 @@ import 'package:flutter/material.dart';
 
 class CardMaterial extends StatefulWidget {
   final MaterialC material;
-  final bool isChild;
+  final bool isParent;
   final void Function(CardMaterial) onPressDelete;
   final void Function(CardMaterial) onPressEdit;
   final void Function(CardMaterial) onPressAdd;
 
   CardMaterial({
-    this.material,
-    this.isChild = false,
+    @required this.material,
+    @required this.isParent,
     this.onPressDelete,
     this.onPressEdit,
     this.onPressAdd,
-  });
+    Key key,
+  }) : super(key: key);
 
   @override
-  _CardMaterialState createState() => _CardMaterialState();
+  CardMaterialState createState() => CardMaterialState();
 }
 
-class _CardMaterialState extends State<CardMaterial> {
-  double pad = 5;
+class CardMaterialState extends State<CardMaterial> {
+  double pad = 7;
+  double padTop;
   double iconSize = 30;
 
   bool isDesplegado = false;
 
   @override
+  void initState() {
+    padTop = widget.isParent ? pad : 0;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(left: pad, top: pad, right: pad),
-      // padding: EdgeInsets.only(pad),
-      // color: Colors.red,
+      margin: EdgeInsets.only(left: pad, top: padTop, right: pad),
       child: Card(
-        // margin: EdgeInsets.all(pad),
         elevation: 3,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(7),
-          // side: BorderSide(color: Color.fromRGBO(245, 245, 245, 1)),
         ),
-        // color: Color.fromRGBO(245, 245, 245, 1),
         child: Container(
           padding: EdgeInsets.all(pad),
           child: Row(
@@ -66,7 +69,6 @@ class _CardMaterialState extends State<CardMaterial> {
           ),
           SizedBox(width: 10),
           Expanded(
-            // flex: 14,
             child: Text(
               widget.material.precio.toString(),
               textAlign: TextAlign.center,
@@ -80,16 +82,14 @@ class _CardMaterialState extends State<CardMaterial> {
 
   Widget iconos() {
     return Container(
-      // color: Colors.amber,
       child: Row(
-        // direction: Axis.horizontal,
         children: <Widget>[
           InkResponse(
             onTap: () => widget.onPressAdd(this.widget),
             child: Icon(
               Icons.add,
               size: iconSize,
-              color: widget.isChild ? Colors.white : Colors.black,
+              color: widget.isParent ? Colors.black : Colors.white,
             ),
           ),
           InkResponse(
@@ -97,7 +97,6 @@ class _CardMaterialState extends State<CardMaterial> {
             child: Icon(
               Icons.edit,
               size: iconSize,
-              // color: Colors.black,
             ),
           ),
           InkResponse(
@@ -109,18 +108,24 @@ class _CardMaterialState extends State<CardMaterial> {
             ),
           ),
           Container(
-            // color: Colors.red,
             padding: EdgeInsets.only(left: 10),
             child: Icon(
               isDesplegado
                   ? Icons.keyboard_arrow_down
                   : Icons.keyboard_arrow_right,
               size: iconSize - iconSize / 4,
-              color: widget.isChild ? Colors.white : Colors.black,
+              color: widget.isParent ? Colors.black : Colors.white,
             ),
           ),
         ],
       ),
     );
   }
+
+  void onPress(bool isSelected) {
+    setState(() {
+      this.isDesplegado = !isSelected;
+    });
+  }
+
 }

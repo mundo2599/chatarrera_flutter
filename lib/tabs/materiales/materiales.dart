@@ -23,6 +23,7 @@ class _MaterialesWidgetState extends State<MaterialesWidget> {
   double inputHeight = 45;
 
   List<MaterialC> materiales;
+  Map<MaterialC, GlobalKey<CardMaterialState>> keysCards = {};
 
   String textActionInputs;
   _MyState myState = _MyState.inputsOcultos;
@@ -66,13 +67,24 @@ class _MaterialesWidgetState extends State<MaterialesWidget> {
         child: TreeView(
           parentList: materiales.map<Parent>(
             (materialPadre) {
+              // Se guardan las keys de cada card para que cuando se haga un changeState no se le asigne una nueva y siga siendo el mismo card
+              GlobalKey<CardMaterialState> key = keysCards[materialPadre];
+                // si aun no tiene key, se crea y se guarda
+              if (key == null) {
+                key = new GlobalKey<CardMaterialState>();
+                keysCards[materialPadre] = key;
+              }
+
               return Parent(
                 parent: CardMaterial(
                   material: materialPadre,
-                  isChild: false,
+                  isParent: true,
                   onPressAdd: this.onPressAddInMaterial,
                   onPressEdit: this.onPressEditar,
+                  key: key,
                 ),
+                callback: (bool isSelected) =>
+                    key.currentState.onPress(isSelected),
                 childList: ChildList(
                   children: materialPadre.hijos.map<Widget>(
                     (materialHijo) {
@@ -80,7 +92,7 @@ class _MaterialesWidgetState extends State<MaterialesWidget> {
                         margin: const EdgeInsets.only(left: 20.0),
                         child: CardMaterial(
                           material: materialHijo,
-                          isChild: true,
+                          isParent: false,
                           onPressEdit: this.onPressEditar,
                         ),
                       );
@@ -243,5 +255,4 @@ class _MaterialesWidgetState extends State<MaterialesWidget> {
   void onPressDelete() {
     // TODO: terminar delete
   }
-
 }
