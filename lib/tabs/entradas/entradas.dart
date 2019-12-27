@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'package:chatarrera_flutter/widgets/textfield_number.dart';
-import 'package:chatarrera_flutter/models/Material.dart';
 import 'package:chatarrera_flutter/widgets/dropdown.dart';
 import 'package:chatarrera_flutter/services/firestore_materiales.dart';
 
@@ -33,7 +32,6 @@ class _EntradasWidgetState extends State<EntradasWidget>
 
   int count = 0;
 
-  List<MaterialC> materiales = <MaterialC>[];
   List<String> clientes = <String>[
     'Fulanito',
     'Fulanita',
@@ -51,11 +49,6 @@ class _EntradasWidgetState extends State<EntradasWidget>
 
   @override
   void initState() {
-    FirestoreMateriales.getMateriales().then((results) {
-      setState(() {
-        materiales = results;
-      });
-    });
     entradasRows.add(entradasRow('Material', 'Kg', 'Precio', 'Pagado'));
     super.initState();
   }
@@ -232,7 +225,7 @@ class _EntradasWidgetState extends State<EntradasWidget>
         children: <Widget>[
           MyDropDown(
             height: inputHeight,
-            items: materiales,
+            items: FirestoreMateriales.materiales,
             hint: 'Material',
             key: dropDownMaterialesKey,
             nextFocus: this.textPrecioFocus,

@@ -1,6 +1,8 @@
 import 'package:chatarrera_flutter/models/Material.dart';
 import 'package:chatarrera_flutter/services/firestore_materiales.dart';
 import 'package:chatarrera_flutter/tabs/materiales/card_material.dart';
+import 'package:chatarrera_flutter/utilities/dialogs.dart';
+import 'package:chatarrera_flutter/widgets/container_title.dart';
 import 'package:chatarrera_flutter/widgets/decorations.dart';
 import 'package:chatarrera_flutter/widgets/textfield_number.dart';
 import 'package:flutter/material.dart';
@@ -22,16 +24,13 @@ class _MaterialesWidgetState extends State<MaterialesWidget> {
   double padding = 5.0;
   double inputHeight = 45;
 
-  List<MaterialC> materiales;
   Map<MaterialC, GlobalKey<CardMaterialState>> keysCards = {};
 
-  String textActionInputs;
   _MyState myState = _MyState.inputsOcultos;
   MaterialC materialPresionado;
 
   @override
   void initState() {
-    this._obtenerMateriales();
     super.initState();
   }
 
@@ -47,29 +46,23 @@ class _MaterialesWidgetState extends State<MaterialesWidget> {
   }
 
   Widget body() {
-    if (materiales != null) {
-      return Column(
-        children: <Widget>[
-          treeViewMateriales(),
-          inputs(),
-        ],
-      );
-    } else {
-      return Center(
-        child: CircularProgressIndicator(),
-      );
-    }
+    return Column(
+      children: <Widget>[
+        treeViewMateriales(),
+        inputs(),
+      ],
+    );
   }
 
   Widget treeViewMateriales() {
     return Expanded(
       child: Container(
         child: TreeView(
-          parentList: materiales.map<Parent>(
+          parentList: FirestoreMateriales.materiales.map<Parent>(
             (materialPadre) {
               // Se guardan las keys de cada card para que cuando se haga un changeState no se le asigne una nueva y siga siendo el mismo card
               GlobalKey<CardMaterialState> key = keysCards[materialPadre];
-                // si aun no tiene key, se crea y se guarda
+              // si aun no tiene key, se crea y se guarda
               if (key == null) {
                 key = new GlobalKey<CardMaterialState>();
                 keysCards[materialPadre] = key;
@@ -81,6 +74,7 @@ class _MaterialesWidgetState extends State<MaterialesWidget> {
                   isParent: true,
                   onPressAdd: this.onPressAddInMaterial,
                   onPressEdit: this.onPressEditar,
+                  onPressDelete: this.onPressDelete,
                   key: key,
                 ),
                 callback: (bool isSelected) =>
@@ -94,6 +88,7 @@ class _MaterialesWidgetState extends State<MaterialesWidget> {
                           material: materialHijo,
                           isParent: false,
                           onPressEdit: this.onPressEditar,
+                          onPressDelete: this.onPressDelete,
                         ),
                       );
                     },
@@ -116,8 +111,17 @@ class _MaterialesWidgetState extends State<MaterialesWidget> {
 
   Widget inputs() {
     if (this.myState != _MyState.inputsOcultos) {
-      return Container(
-        decoration: BoxDecoration(border: borderGris(top: true, bottom: true)),
+      String title;
+      if(this.myState == _MyState.creandoNuevo)
+        title = 'Nuevo material';
+      else if(this.myState == _MyState.creandoSub)
+        title = 'Nuevo submaterial de ' + this.materialPresionado.nombre;
+      else if(this.myState == _MyState.editando)
+        title = 'Editando material';
+
+      return ContainerWithTitle(
+        title: title,
+        decoration: BoxDecoration(border: borderGris(top: true)),
         padding: EdgeInsets.all(padding),
         child: Row(
           children: <Widget>[
@@ -162,7 +166,7 @@ class _MaterialesWidgetState extends State<MaterialesWidget> {
             onTap: this.onPressAddNewMaterial,
             child: Icon(
               Icons.add_circle_outline,
-              size: 30,
+              size: 45,
             ),
           ),
         ),
@@ -171,14 +175,6 @@ class _MaterialesWidgetState extends State<MaterialesWidget> {
   }
 
 // ----------------------- FUNCIONES ------------------------------------------------------
-  Future<void> _obtenerMateriales() async {
-    await FirestoreMateriales.getMateriales().then((materiales) {
-      setState(() => this.materiales = materiales);
-    }).catchError((onError) {
-      print('error al obtener materiales :C');
-    });
-  }
-
   void _onPressAceptar() {
     MaterialC materialNuevo = MaterialC();
     if (this.textNombreController.text != '') {
@@ -197,18 +193,14 @@ class _MaterialesWidgetState extends State<MaterialesWidget> {
     switch (myState) {
       case _MyState.creandoNuevo:
         FirestoreMateriales.addMaterial(materialNuevo).then((_) {
-          setState(() {
-            this.materiales.add(materialNuevo);
-          });
           this.changeMyState(_MyState.inputsOcultos);
         });
         break;
       case _MyState.creandoSub:
-        materialNuevo.idPadre = this.materialPresionado.id;
-        FirestoreMateriales.addMaterial(materialNuevo).then((_) {
-          setState(() {
-            this.materialPresionado.hijos.add(materialNuevo);
-          });
+        FirestoreMateriales.addSubMaterial(
+          padre: this.materialPresionado,
+          hijo: materialNuevo,
+        ).then((_) {
           this.changeMyState(_MyState.inputsOcultos);
         });
         break;
@@ -252,7 +244,34 @@ class _MaterialesWidgetState extends State<MaterialesWidget> {
     this.changeMyState(_MyState.inputsOcultos);
   }
 
-  void onPressDelete() {
-    // TODO: terminar delete
+  void onPressDelete(CardMaterial cardPresionado) {
+    if (cardPresionado.material.hijos.length != 0) {
+      // Si tiene hijos, no puede borrarse
+      showSimpleDialog(
+        context: context,
+        titleText: "Error",
+        contentText:
+            "El material tiene submateriales, no se puede eliminar un material con submateriales",
+      );
+    } else {
+      // Si no tiene hijos, eliminar
+      FirestoreMateriales.deleteMaterial(cardPresionado.material).then(
+        (_) {
+          setState(() {});
+          showSimpleDialog(
+            context: context,
+            titleText: "Exito",
+            contentText: "Se ha eliminado el material",
+          );
+        },
+        onError: (error) {
+          showSimpleDialog(
+            context: context,
+            titleText: "Error",
+            contentText: "Algo salio mal",
+          );
+        },
+      );
+    }
   }
 }

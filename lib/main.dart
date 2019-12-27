@@ -1,3 +1,4 @@
+import 'package:chatarrera_flutter/services/firestore_materiales.dart';
 import 'package:flutter/material.dart';
 
 import 'package:chatarrera_flutter/tabs/salidas/salidas.dart';
@@ -7,10 +8,9 @@ import 'package:chatarrera_flutter/tabs/entradas/entradas.dart';
 void main() {
   runApp(
     MaterialApp(
-      // Title
       title: "Chatarrera app",
-      // Home
       home: MyHome(),
+      theme: ThemeData.light(),
     ),
   );
 }
@@ -22,6 +22,7 @@ class MyHome extends StatefulWidget {
 
 class MyHomeState extends State<MyHome> {
   int currentIndex = 0;
+
   final List<Widget> children = [
     MaterialesWidget(),
     EntradasWidget(),
@@ -32,19 +33,26 @@ class MyHomeState extends State<MyHome> {
 
   @override
   void initState() {
+    FirestoreMateriales.obtenerMateriales().then((_) => setState(() {}));
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: PageView(
-        children: this.children,
-        controller: this.pageController,
-        onPageChanged: this.onPageChanged,
-      ),
-      bottomNavigationBar: getNavBar(),
-    );
+    if (FirestoreMateriales.materiales != null) {
+      return Scaffold(
+        body: PageView(
+          children: this.children,
+          controller: this.pageController,
+          onPageChanged: this.onPageChanged,
+        ),
+        bottomNavigationBar: getNavBar(),
+      );
+    } else {
+      return Center(
+        child: CircularProgressIndicator(),
+      );
+    }
   }
 
   void onPageChanged(int index) {
