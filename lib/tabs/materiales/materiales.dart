@@ -39,7 +39,7 @@ class _MaterialesWidgetState extends State<MaterialesWidget> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Materiales"),
-        backgroundColor: Colors.grey,
+        backgroundColor: Theme.of(context).primaryColor,
       ),
       body: body(),
     );

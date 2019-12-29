@@ -59,7 +59,7 @@ class _EntradasWidgetState extends State<EntradasWidget>
     return Scaffold(
       appBar: AppBar(
         title: Text("Entradas"),
-        backgroundColor: Colors.grey,
+        backgroundColor: Theme.of(context).primaryColor,
       ),
       body: Column(
         children: <Widget>[
@@ -88,9 +88,9 @@ class _EntradasWidgetState extends State<EntradasWidget>
                     height: inputHeight,
                     decoration: decorationButtons(),
                     child: RaisedButton(
+                      color: Theme.of(context).buttonColor,
                       onPressed: selectDate,
-                      child:
-                          new Text(DateFormat("dd/MM/yyyy").format(valueDate)),
+                      child: Text(DateFormat("dd/MM/yyyy").format(valueDate)),
                     ),
                   ),
                   SizedBox(
@@ -111,7 +111,7 @@ class _EntradasWidgetState extends State<EntradasWidget>
             margin: EdgeInsets.symmetric(horizontal: padding),
             decoration: decorationButtons(),
             child: RaisedButton(
-              // color: Colors.blue,
+              color: Theme.of(context).buttonColor,
               onPressed: () {},
               child: const Text('Resumen', style: TextStyle(fontSize: 16)),
             ),

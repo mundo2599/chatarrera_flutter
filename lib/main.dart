@@ -10,7 +10,8 @@ void main() {
     MaterialApp(
       title: "Chatarrera app",
       home: MyHome(),
-      theme: ThemeData.light(),
+      // TODO: Definir colores propios
+      theme: ThemeData.dark().copyWith(),
     ),
   );
 }

@@ -11,7 +11,7 @@ class _SalidasWidgetState extends State<SalidasWidget> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Salidas"),
-        backgroundColor: Colors.grey,
+        backgroundColor: Theme.of(context).primaryColor,
       ),
       body: Container(
         child: Center(child: Text('Salidas')),

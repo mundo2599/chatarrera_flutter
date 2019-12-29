@@ -84,19 +84,21 @@ class CardMaterialState extends State<CardMaterial> {
     return Container(
       child: Row(
         children: <Widget>[
-          InkResponse(
-            onTap: () => widget.onPressAdd(this.widget),
-            child: Icon(
-              Icons.add,
-              size: iconSize,
-              color: widget.isParent ? Colors.black : Colors.white,
-            ),
-          ),
+          (widget.isParent
+              ? InkResponse(
+                  onTap: () => widget.onPressAdd(this.widget),
+                  child: Icon(
+                    Icons.add,
+                    size: iconSize,
+                  ),
+                )
+              : SizedBox(width: iconSize)),
           InkResponse(
             onTap: () => widget.onPressEdit(this.widget),
             child: Icon(
               Icons.edit,
               size: iconSize,
+              color: Theme.of(context).accentColor,
             ),
           ),
           InkResponse(
@@ -109,13 +111,15 @@ class CardMaterialState extends State<CardMaterial> {
           ),
           Container(
             padding: EdgeInsets.only(left: 10),
-            child: Icon(
-              isDesplegado
-                  ? Icons.keyboard_arrow_down
-                  : Icons.keyboard_arrow_right,
-              size: iconSize - iconSize / 4,
-              color: widget.isParent ? Colors.black : Colors.white,
-            ),
+            child: (widget.isParent && widget.material.hijos.length > 0
+                ? Icon(
+                    isDesplegado
+                        ? Icons.keyboard_arrow_down
+                        : Icons.keyboard_arrow_right,
+                    size: iconSize - iconSize / 4,
+                    // color: Theme.of(context).accentColor,
+                  )
+                : SizedBox(width: iconSize - iconSize / 4)),
           ),
         ],
       ),
@@ -127,5 +131,4 @@ class CardMaterialState extends State<CardMaterial> {
       this.isDesplegado = !isSelected;
     });
   }
-
 }
