@@ -29,12 +29,20 @@ class FirestoreMateriales {
     });
   }
 
+  /// Regresa el material que corresponda al id proporcionado.
+  /// Se arrojara excepcion al no haberse descargado los materiales aun, o cuando este no sea encontrado;
+  static MaterialC getMaterialByID(String id) {
+    assert(materiales != null);
+    assert(materiales.length > 0);
+    return materiales.firstWhere((material) => material.id == id);
+  }
+
   static Future<void> obtenerMateriales() {
     return _getMateriales().then((materiales) {
       // Asignar materiales de base de datos a lista local
       FirestoreMateriales.materiales = materiales;
     }).catchError((onError) {
-      throw('error al obtener materiales :C');
+      throw ('error al obtener materiales :C');
     });
   }
 
@@ -43,7 +51,6 @@ class FirestoreMateriales {
       materiales.remove(material);
     });
   }
-
 
   /// Agregar un nuevo material a Firebase
   static Future<void> _addMaterial(MaterialC material) {
@@ -87,8 +94,7 @@ class FirestoreMateriales {
   }
 
   static Future<void> _deleteMaterial(String id) {
-    if(id == null && id == '')
-      throw('Se requiere un id para eliminar');
+    if (id == null && id == '') throw ('Se requiere un id para eliminar');
     return materialesRef.document(id).delete();
   }
 }

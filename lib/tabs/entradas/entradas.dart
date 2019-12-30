@@ -1,3 +1,6 @@
+import 'package:chatarrera_flutter/models/Entrada.dart';
+import 'package:chatarrera_flutter/models/Material.dart';
+import 'package:chatarrera_flutter/utilities/dialogs.dart';
 import 'package:chatarrera_flutter/widgets/decorations.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -15,12 +18,10 @@ class _EntradasWidgetState extends State<EntradasWidget>
     with AutomaticKeepAliveClientMixin {
   final dropDownFiltrosKey = UniqueKey();
 
-  final dropDownMaterialesKey = GlobalKey<MyDropDownState>();
+  final dropDownMaterialesKey = GlobalKey<MyDropDownState<MaterialC>>();
   final textFieldPrecioKey = UniqueKey();
   final textFieldKgKey = UniqueKey();
   final textFieldPagadoKey = UniqueKey();
-
-  final dropDownClientesKey = UniqueKey();
 
   FocusNode textPrecioFocus = FocusNode();
   FocusNode textKgFocus = FocusNode();
@@ -46,12 +47,6 @@ class _EntradasWidgetState extends State<EntradasWidget>
   //by default it will be null, change it to true.
   @override
   bool get wantKeepAlive => true;
-
-  @override
-  void initState() {
-    entradasRows.add(entradasRow('Material', 'Kg', 'Precio', 'Pagado'));
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +76,8 @@ class _EntradasWidgetState extends State<EntradasWidget>
             child: Container(
               // color: Colors.blueAccent,
               padding: EdgeInsets.all(padding),
-              decoration: BoxDecoration(border: borderGris(rigth: true)),
+              decoration:
+                  BoxDecoration(border: borderGris(rigth: true, width: 1.0)),
               child: Row(
                 children: <Widget>[
                   Container(
@@ -132,21 +128,43 @@ class _EntradasWidgetState extends State<EntradasWidget>
   }
 
 // ==============================View de entradas=========================
-  List<Widget> entradasRows = [];
+  List<Entrada> entradas = [];
   Widget listViewEntradas() {
     return Expanded(
-      flex: 1,
       child: Container(
-        decoration: BoxDecoration(border: borderGris(bottom: true, top: true)),
-        // color: Colors.grey,
-        child: ListView(children: entradasRows),
+        decoration: BoxDecoration(
+          border: borderGris(bottom: true, top: true, width: 1.0),
+        ),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: DataTable(
+            columns: [
+              DataColumn(label: Text('Material')),
+              DataColumn(label: Text('Kg')),
+              DataColumn(label: Text('Precio')),
+              DataColumn(label: Text('Pagado')),
+            ],
+            rows: entradas.map<DataRow>(
+              (entrada) {
+                return DataRow(
+                  cells: [
+                    DataCell(Text(entrada.material.nombre)),
+                    DataCell(Text(entrada.kg.toString())),
+                    DataCell(Text(entrada.precio.toString())),
+                    DataCell(Text(entrada.pagado.toString())),
+                  ],
+                );
+              },
+            ).toList(),
+          ),
+        ),
       ),
     );
   }
 
   Widget entradasRow(v1, v2, v3, v4) {
     return Container(
-      decoration: BoxDecoration(border: borderGris(bottom: true)),
+      decoration: BoxDecoration(border: borderGris(bottom: true, width: 1.0)),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
@@ -169,7 +187,8 @@ class _EntradasWidgetState extends State<EntradasWidget>
             flex: 17,
             child: Container(
               // color: Colors.indigo,
-              decoration: BoxDecoration(border: borderGris(rigth: true)),
+              decoration:
+                  BoxDecoration(border: borderGris(rigth: true, width: 1.0)),
               padding: EdgeInsets.all(padding),
               child: Column(
                 children: <Widget>[
@@ -223,7 +242,7 @@ class _EntradasWidgetState extends State<EntradasWidget>
       padding: EdgeInsets.only(bottom: padding),
       child: Row(
         children: <Widget>[
-          MyDropDown(
+          MyDropDown<MaterialC>(
             height: inputHeight,
             items: FirestoreMateriales.materiales,
             hint: 'Material',
@@ -272,17 +291,28 @@ class _EntradasWidgetState extends State<EntradasWidget>
   }
 
   void registrarEntrada() {
-    setState(() {
-      this.entradasRows = List.from(this.entradasRows)
-        ..add(
-          entradasRow(
-              this.dropDownMaterialesKey.currentState.valorActual,
-              textKgController.text,
-              textPrecioController.text,
-              textPagadoController.text),
-        );
-    });
-    print(entradasRows.length);
+    bool error = false;
+
+    Entrada entrada = Entrada();
+    entrada.material = this.dropDownMaterialesKey.currentState.valorActual;
+    if (entrada.material == null) error = true;
+
+    try {
+      entrada.kg = double.parse(textKgController.text);
+      entrada.pagado = double.parse(textPagadoController.text);
+    } catch (e) {
+      error = true;
+    }
+
+    if (error) {
+      showSimpleDialog(
+        context: context,
+        titleText: "Error",
+        contentText: "Hay un error en los datos de la entrada",
+      );
+    } else {
+      setState(() => this.entradas.add(entrada));
+    }
   }
 
   void limpiarInputs() {

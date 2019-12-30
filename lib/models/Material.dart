@@ -23,6 +23,7 @@ class MaterialC {
   Map<String, dynamic> toMap() {
     assert(this.nombre != null && this.nombre != '');
     assert(this.precio != null);
+    assert(this.id != null);
 
     Map<String, dynamic> map = Map<String, dynamic>();
       

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-class MyDropDown extends StatefulWidget {
+class MyDropDown<T> extends StatefulWidget {
 
-  final List<dynamic> items;
+  final List<T> items;
   final EdgeInsets margin;
   final double height;
   final String hint;
@@ -18,12 +18,12 @@ class MyDropDown extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  MyDropDownState createState() => new MyDropDownState();
+  MyDropDownState<T> createState() => new MyDropDownState<T>();
 }
 
-class MyDropDownState extends State<MyDropDown> {
+class MyDropDownState<T> extends State<MyDropDown> {
 
-  dynamic valorActual;
+  T valorActual;
 
   @override
   Widget build(BuildContext context) {
@@ -39,11 +39,11 @@ class MyDropDownState extends State<MyDropDown> {
           )
         ),
         child: DropdownButtonHideUnderline(
-          child: DropdownButton<dynamic> (
+          child: DropdownButton<T> (
             hint: Text(widget.hint),
             isExpanded: true,
             value: valorActual,
-            onChanged: (dynamic newValue) {
+            onChanged: (T newValue) {
               if(widget.nextFocus != null)
                 FocusScope.of(context).requestFocus(widget.nextFocus);
               setState(() {
@@ -51,8 +51,8 @@ class MyDropDownState extends State<MyDropDown> {
               });
             },
             items: widget.items
-              .map<DropdownMenuItem<dynamic>>((dynamic value) {
-                return DropdownMenuItem<dynamic>(
+              .map<DropdownMenuItem<T>>((dynamic value) {
+                return DropdownMenuItem<T>(
                   value: value,
                   child: Text(value.toString()),
                 );

@@ -6,6 +6,7 @@ Border borderGris({
   bool top = false,
   bool bottom = false,
   bool all = false,
+  double width = 2.0,
 }) {
   if (all) {
     left = rigth = top = bottom = true;
@@ -15,25 +16,25 @@ Border borderGris({
         ? BorderSide.none
         : BorderSide(
             color: Colors.grey,
-            width: 2.0,
+            width: width,
           ),
     right: !rigth
         ? BorderSide.none
         : BorderSide(
             color: Colors.grey,
-            width: 2.0,
+            width: width,
           ),
     top: !top
         ? BorderSide.none
         : BorderSide(
             color: Colors.grey,
-            width: 2.0,
+            width: width,
           ),
     bottom: !bottom
         ? BorderSide.none
         : BorderSide(
             color: Colors.grey,
-            width: 2.0,
+            width: width,
           ),
   );
 }
