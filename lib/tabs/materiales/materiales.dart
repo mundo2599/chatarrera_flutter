@@ -3,7 +3,7 @@ import 'package:chatarrera_flutter/services/firestore_materiales.dart';
 import 'package:chatarrera_flutter/tabs/materiales/card_material.dart';
 import 'package:chatarrera_flutter/utilities/dialogs.dart';
 import 'package:chatarrera_flutter/widgets/container_title.dart';
-import 'package:chatarrera_flutter/widgets/decorations.dart';
+import 'package:chatarrera_flutter/utilities/decorations.dart';
 import 'package:chatarrera_flutter/widgets/textfield_number.dart';
 import 'package:flutter/material.dart';
 import 'package:tree_view/tree_view.dart';

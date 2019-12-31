@@ -1,7 +1,8 @@
 import 'package:chatarrera_flutter/models/Entrada.dart';
 import 'package:chatarrera_flutter/models/Material.dart';
+import 'package:chatarrera_flutter/services/firestore_entradas.dart';
 import 'package:chatarrera_flutter/utilities/dialogs.dart';
-import 'package:chatarrera_flutter/widgets/decorations.dart';
+import 'package:chatarrera_flutter/utilities/decorations.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -49,6 +50,12 @@ class _EntradasWidgetState extends State<EntradasWidget>
   bool get wantKeepAlive => true;
 
   @override
+  void initState() {
+    obtenerEntradas();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
@@ -92,12 +99,6 @@ class _EntradasWidgetState extends State<EntradasWidget>
                   SizedBox(
                     width: padding,
                   ),
-                  MyDropDown(
-                    hint: 'Filtro',
-                    height: inputHeight,
-                    items: filtros,
-                    key: dropDownFiltrosKey,
-                  )
                 ],
               ),
             ),
@@ -124,7 +125,10 @@ class _EntradasWidgetState extends State<EntradasWidget>
       firstDate: new DateTime(2016),
       lastDate: new DateTime(2020),
     );
-    if (picked != null) setState(() => valueDate = picked);
+    if (picked != null) {
+      setState(() => valueDate = picked);
+      obtenerEntradas();
+    }
   }
 
 // ==============================View de entradas=========================
@@ -294,6 +298,7 @@ class _EntradasWidgetState extends State<EntradasWidget>
     bool error = false;
 
     Entrada entrada = Entrada();
+    entrada.fecha = valueDate;
     entrada.material = this.dropDownMaterialesKey.currentState.valorActual;
     if (entrada.material == null) error = true;
 
@@ -304,18 +309,44 @@ class _EntradasWidgetState extends State<EntradasWidget>
       error = true;
     }
 
+    if (!error) {
+      FirestoreEntradas.addEntrada(entrada).then(
+        (_) {
+          limpiarInputs();
+          setState(() => this.entradas.add(entrada));
+        },
+        onError: (e) => error = true,
+      );
+    }
+
     if (error) {
       showSimpleDialog(
         context: context,
         titleText: "Error",
         contentText: "Hay un error en los datos de la entrada",
       );
-    } else {
-      setState(() => this.entradas.add(entrada));
     }
   }
 
   void limpiarInputs() {
-    // TODO: Limpiar inputs de precio material etc
+    FocusScope.of(context).unfocus();
+    this.dropDownMaterialesKey.currentState.clearSelect();
+    this.textKgController.clear();
+    this.textPagadoController.clear();
+    this.textPrecioController.clear();
+  }
+
+  void obtenerEntradas() {
+    FirestoreEntradas.getEntradas(
+      fechaInicio: DateTime(
+        this.valueDate.year,
+        this.valueDate.month,
+        this.valueDate.day,
+      ),
+    ).then((entradas) {
+      setState(() {
+        this.entradas = entradas;
+      });
+    });
   }
 }

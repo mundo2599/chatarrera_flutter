@@ -1,4 +1,3 @@
-// TODO: Modelo de Entrada
 import 'package:chatarrera_flutter/models/Material.dart';
 import 'package:chatarrera_flutter/services/firestore_materiales.dart';
 
@@ -23,19 +22,19 @@ class Entrada {
     this.id = id;
     this.material = FirestoreMateriales.getMaterialByID(map['id_material']);
     this.kg = map['kg'];
+    this.fecha = DateTime.parse(map['fecha']);
     this.pagado = map['pagado'];
-    this.fecha = map['fecha'];
   }
 
   Map<String, dynamic> toMap() {
-    assert(this.id != null);
+    assert(this.material != null);
 
     Map<String, dynamic> map = Map<String, dynamic>();
 
     map['kg'] = this.kg;
     map['id_material'] = this.material.id;
     map['pagado'] = this.pagado;
-    map['fecha'] = this.fecha;
+    map['fecha'] = this.fecha.toString();
 
     return map;
   }
