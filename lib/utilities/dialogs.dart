@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
 
-void showSimpleDialog({
+void showWidgetDialog({
   @required BuildContext context,
   @required String titleText,
-  @required String contentText,
+  @required Widget content,
 }) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
       // return object of type Dialog
       return AlertDialog(
-        title: new Text(titleText),
-        content: new Text(contentText),
+        contentPadding: EdgeInsets.all(0),
+        title: Text(titleText),
+        content: content,
         actions: <Widget>[
           // usually buttons at the bottom of the dialog
           new FlatButton(
-            child: new Text("Close"),
+            child: Text("Close"),
             onPressed: () {
               Navigator.of(context).pop();
             },
@@ -23,5 +24,17 @@ void showSimpleDialog({
         ],
       );
     },
+  );
+}
+
+void showSimpleDialog({
+  @required BuildContext context,
+  @required String titleText,
+  @required String contentText,
+}) {
+  showWidgetDialog(
+    context: context,
+    titleText: titleText,
+    content: Text(contentText),
   );
 }

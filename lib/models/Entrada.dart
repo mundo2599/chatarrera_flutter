@@ -4,17 +4,22 @@ import 'package:chatarrera_flutter/services/firestore_materiales.dart';
 class Entrada {
   String id;
   MaterialC material;
-  double kg;
-  double pagado;
+  double kg = 0;
+  double pagado = 0;
   DateTime fecha;
 
-  double get precio => pagado / kg;
+  double get precio {
+    if (kg == 0.0)
+      return 0.0;
+    else
+      return pagado / kg;
+  }
 
   Entrada({
     this.id,
     this.material,
-    this.kg,
-    this.pagado,
+    this.kg = 0,
+    this.pagado = 0,
     this.fecha,
   });
 
@@ -37,5 +42,16 @@ class Entrada {
     map['fecha'] = this.fecha.toString();
 
     return map;
+  }
+
+  Entrada operator +(Entrada other) {
+    if (other.material != this.material)
+      throw ('No se pueden sumar Entradas con materiales distintos');
+
+    return Entrada(
+      material: this.material,
+      kg: this.kg + other.kg,
+      pagado: this.pagado + other.pagado,
+    );
   }
 }

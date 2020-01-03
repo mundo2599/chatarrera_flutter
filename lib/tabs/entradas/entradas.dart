@@ -1,6 +1,7 @@
 import 'package:chatarrera_flutter/models/Entrada.dart';
 import 'package:chatarrera_flutter/models/Material.dart';
 import 'package:chatarrera_flutter/services/firestore_entradas.dart';
+import 'package:chatarrera_flutter/tabs/entradas/tabla_entradas.dart';
 import 'package:chatarrera_flutter/utilities/dialogs.dart';
 import 'package:chatarrera_flutter/utilities/decorations.dart';
 import 'package:flutter/material.dart';
@@ -34,14 +35,9 @@ class _EntradasWidgetState extends State<EntradasWidget>
 
   int count = 0;
 
-  List<String> clientes = <String>[
-    'Fulanito',
-    'Fulanita',
-  ];
-  List<String> filtros = <String>['Ascendente', 'Descendente', 'Material'];
-
   double padding = 5.0;
   double inputHeight = 45;
+  double bordersWidth = 1.0;
 
   DateTime valueDate = DateTime.now();
 
@@ -76,6 +72,9 @@ class _EntradasWidgetState extends State<EntradasWidget>
 // ===============================Barra superior========================
   Widget barraArriba() {
     return Container(
+      decoration: BoxDecoration(
+        border: borderGris(bottom: true, width: bordersWidth),
+      ),
       child: Row(
         // mainAxisSize: MainAxisSize.max,
         children: <Widget>[
@@ -83,8 +82,9 @@ class _EntradasWidgetState extends State<EntradasWidget>
             child: Container(
               // color: Colors.blueAccent,
               padding: EdgeInsets.all(padding),
-              decoration:
-                  BoxDecoration(border: borderGris(rigth: true, width: 1.0)),
+              decoration: BoxDecoration(
+                border: borderGris(rigth: true, width: bordersWidth),
+              ),
               child: Row(
                 children: <Widget>[
                   Container(
@@ -109,7 +109,7 @@ class _EntradasWidgetState extends State<EntradasWidget>
             decoration: decorationButtons(),
             child: RaisedButton(
               color: Theme.of(context).buttonColor,
-              onPressed: () {},
+              onPressed: onPressResumen,
               child: const Text('Resumen', style: TextStyle(fontSize: 16)),
             ),
           ),
@@ -123,7 +123,7 @@ class _EntradasWidgetState extends State<EntradasWidget>
       context: context,
       initialDate: new DateTime.now(),
       firstDate: new DateTime(2016),
-      lastDate: new DateTime(2020),
+      lastDate: new DateTime.now().add(Duration(days: 365)),
     );
     if (picked != null) {
       setState(() => valueDate = picked);
@@ -135,48 +135,8 @@ class _EntradasWidgetState extends State<EntradasWidget>
   List<Entrada> entradas = [];
   Widget listViewEntradas() {
     return Expanded(
-      child: Container(
-        decoration: BoxDecoration(
-          border: borderGris(bottom: true, top: true, width: 1.0),
-        ),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: DataTable(
-            columns: [
-              DataColumn(label: Text('Material')),
-              DataColumn(label: Text('Kg')),
-              DataColumn(label: Text('Precio')),
-              DataColumn(label: Text('Pagado')),
-            ],
-            rows: entradas.map<DataRow>(
-              (entrada) {
-                return DataRow(
-                  cells: [
-                    DataCell(Text(entrada.material.nombre)),
-                    DataCell(Text(entrada.kg.toString())),
-                    DataCell(Text(entrada.precio.toString())),
-                    DataCell(Text(entrada.pagado.toString())),
-                  ],
-                );
-              },
-            ).toList(),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget entradasRow(v1, v2, v3, v4) {
-    return Container(
-      decoration: BoxDecoration(border: borderGris(bottom: true, width: 1.0)),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          Expanded(child: Center(child: Text(v1.toString()))),
-          Expanded(child: Center(child: Text(v2.toString()))),
-          Expanded(child: Center(child: Text(v3.toString()))),
-          Expanded(child: Center(child: Text(v4.toString()))),
-        ],
+      child: TablaEntradas(
+        entradas: entradas,
       ),
     );
   }
@@ -184,15 +144,19 @@ class _EntradasWidgetState extends State<EntradasWidget>
 // ============================Inputs de entradas==========================
   Widget datosParaEntradas() {
     return Container(
-      height: inputHeight * 2 + padding * 3,
+      decoration: BoxDecoration(
+        border: borderGris(top: true, bottom: true, width: bordersWidth),
+      ),
+      height: inputHeight * 2 + padding * 3 + bordersWidth * 2,
       child: Row(
         children: <Widget>[
           Expanded(
             flex: 17,
             child: Container(
               // color: Colors.indigo,
-              decoration:
-                  BoxDecoration(border: borderGris(rigth: true, width: 1.0)),
+              decoration: BoxDecoration(
+                border: borderGris(rigth: true, width: bordersWidth),
+              ),
               padding: EdgeInsets.all(padding),
               child: Column(
                 children: <Widget>[
@@ -348,5 +312,31 @@ class _EntradasWidgetState extends State<EntradasWidget>
         this.entradas = entradas;
       });
     });
+  }
+
+  void onPressResumen() {
+    Map<MaterialC, Entrada> resumenMap = <MaterialC, Entrada>{};
+    for (MaterialC material in FirestoreMateriales.materiales)
+      resumenMap[material] = Entrada(material: material);
+
+    for (Entrada entrada in entradas) resumenMap[entrada.material] += entrada;
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) {
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(
+                "Resumen de " + DateFormat("dd/MM/yyyy").format(valueDate),
+              ),
+            ),
+            body: Center(
+              heightFactor: 1,
+              child: TablaEntradas(entradas: resumenMap.values.toList()),
+            ),
+          );
+        },
+      ),
+    );
   }
 }

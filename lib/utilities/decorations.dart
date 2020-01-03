@@ -8,34 +8,18 @@ Border borderGris({
   bool all = false,
   double width = 2.0,
 }) {
-  if (all) {
-    left = rigth = top = bottom = true;
-  }
+  if (all) left = rigth = top = bottom = true;
+
+  BorderSide borderSide = BorderSide(
+    color: Colors.grey,
+    width: width,
+  );
+
   return Border(
-    left: !left
-        ? BorderSide.none
-        : BorderSide(
-            color: Colors.grey,
-            width: width,
-          ),
-    right: !rigth
-        ? BorderSide.none
-        : BorderSide(
-            color: Colors.grey,
-            width: width,
-          ),
-    top: !top
-        ? BorderSide.none
-        : BorderSide(
-            color: Colors.grey,
-            width: width,
-          ),
-    bottom: !bottom
-        ? BorderSide.none
-        : BorderSide(
-            color: Colors.grey,
-            width: width,
-          ),
+    left: !left ? BorderSide.none : borderSide,
+    right: !rigth ? BorderSide.none : borderSide,
+    top: !top ? BorderSide.none : borderSide,
+    bottom: !bottom ? BorderSide.none : borderSide,
   );
 }
 
