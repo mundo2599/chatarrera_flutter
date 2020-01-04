@@ -2,6 +2,7 @@ import 'package:chatarrera_flutter/models/Entrada.dart';
 import 'package:chatarrera_flutter/models/Material.dart';
 import 'package:chatarrera_flutter/services/firestore_entradas.dart';
 import 'package:chatarrera_flutter/tabs/entradas/tabla_entradas.dart';
+import 'package:chatarrera_flutter/utilities/date_range_picker.dart';
 import 'package:chatarrera_flutter/utilities/dialogs.dart';
 import 'package:chatarrera_flutter/utilities/decorations.dart';
 import 'package:flutter/material.dart';
@@ -35,11 +36,11 @@ class _EntradasWidgetState extends State<EntradasWidget>
 
   int count = 0;
 
-  double padding = 5.0;
+  double padding = 10.0;
   double inputHeight = 45;
-  double bordersWidth = 1.0;
+  double bordersWidth = 2;
 
-  DateTime valueDate = DateTime.now();
+  DateTime beginDate = DateTime.now(), endDate;
 
   //by default it will be null, change it to true.
   @override
@@ -72,45 +73,49 @@ class _EntradasWidgetState extends State<EntradasWidget>
 // ===============================Barra superior========================
   Widget barraArriba() {
     return Container(
+      height: inputHeight,
+      padding: EdgeInsets.symmetric(horizontal: padding),
       decoration: BoxDecoration(
         border: borderGris(bottom: true, width: bordersWidth),
       ),
       child: Row(
-        // mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
+          // Seleccionar lapso de fecha
           Expanded(
-            child: Container(
-              // color: Colors.blueAccent,
-              padding: EdgeInsets.all(padding),
-              decoration: BoxDecoration(
-                border: borderGris(rigth: true, width: bordersWidth),
-              ),
-              child: Row(
-                children: <Widget>[
-                  Container(
-                    height: inputHeight,
-                    decoration: decorationButtons(),
-                    child: RaisedButton(
-                      color: Theme.of(context).buttonColor,
-                      onPressed: selectDate,
-                      child: Text(DateFormat("dd/MM/yyyy").format(valueDate)),
+            child: InkResponse(
+              onTap: selectDate,
+              child: Container(
+                height: inputHeight,
+                decoration: BoxDecoration(
+                  border: borderGris(rigth: true, width: bordersWidth),
+                ),
+                margin: EdgeInsets.only(right: padding),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Icon(
+                      Icons.date_range,
+                      size: inputHeight / 1.5,
                     ),
-                  ),
-                  SizedBox(
-                    width: padding,
-                  ),
-                ],
+
+                    SizedBox(width: padding * 2),
+                    
+                    Text(textoFecha()),
+                  ],
+                ),
               ),
             ),
           ),
-          Container(
-            height: inputHeight,
-            margin: EdgeInsets.symmetric(horizontal: padding),
-            decoration: decorationButtons(),
+          // Boton para ver resumen
+          Center(
             child: RaisedButton(
-              color: Theme.of(context).buttonColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(7),
+              ),
               onPressed: onPressResumen,
-              child: const Text('Resumen', style: TextStyle(fontSize: 16)),
+              child: Text('Resumen'),
             ),
           ),
         ],
@@ -118,27 +123,42 @@ class _EntradasWidgetState extends State<EntradasWidget>
     );
   }
 
-  Future selectDate() async {
-    DateTime picked = await showDatePicker(
-      context: context,
-      initialDate: new DateTime.now(),
-      firstDate: new DateTime(2016),
-      lastDate: new DateTime.now().add(Duration(days: 365)),
-    );
-    if (picked != null) {
-      setState(() => valueDate = picked);
-      obtenerEntradas();
-    }
+  void selectDate() {
+    showDateRangePicker(context).then((fechas) {
+      if (fechas != null) {
+        setState(() {
+          beginDate = fechas['begin'];
+          endDate = fechas['end'];
+        });
+        obtenerEntradas();
+      }
+    });
+  }
+
+  String textoFecha() {
+    String textoFecha = DateFormat("dd/MM/yyyy").format(beginDate);
+    if (endDate != null)
+      textoFecha += ' - ' + DateFormat("dd/MM/yyyy").format(endDate);
+    return textoFecha;
   }
 
 // ==============================View de entradas=========================
-  List<Entrada> entradas = [];
+  List<Entrada> entradas;
   Widget listViewEntradas() {
-    return Expanded(
-      child: TablaEntradas(
-        entradas: entradas,
-      ),
-    );
+    // Si se estan cargando las entradas, mostrar un indicador circular de progreso
+    if (entradas == null) {
+      return Expanded(
+        child: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    } else {
+      return Expanded(
+        child: TablaEntradas(
+          entradas: entradas,
+        ),
+      );
+    }
   }
 
 // ============================Inputs de entradas==========================
@@ -262,7 +282,7 @@ class _EntradasWidgetState extends State<EntradasWidget>
     bool error = false;
 
     Entrada entrada = Entrada();
-    entrada.fecha = valueDate;
+    entrada.fecha = beginDate;
     entrada.material = this.dropDownMaterialesKey.currentState.valorActual;
     if (entrada.material == null) error = true;
 
@@ -301,12 +321,10 @@ class _EntradasWidgetState extends State<EntradasWidget>
   }
 
   void obtenerEntradas() {
+    setState(() => entradas = null);
     FirestoreEntradas.getEntradas(
-      fechaInicio: DateTime(
-        this.valueDate.year,
-        this.valueDate.month,
-        this.valueDate.day,
-      ),
+      fechaInicio: this.beginDate,
+      fechaFin: this.endDate,
     ).then((entradas) {
       setState(() {
         this.entradas = entradas;
@@ -326,9 +344,7 @@ class _EntradasWidgetState extends State<EntradasWidget>
         builder: (context) {
           return Scaffold(
             appBar: AppBar(
-              title: Text(
-                "Resumen de " + DateFormat("dd/MM/yyyy").format(valueDate),
-              ),
+              title: Text(textoFecha()),
             ),
             body: Center(
               heightFactor: 1,

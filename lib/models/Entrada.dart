@@ -12,7 +12,7 @@ class Entrada {
     if (kg == 0.0)
       return 0.0;
     else
-      return pagado / kg;
+      return double.parse((pagado / kg).toStringAsFixed(2));
   }
 
   Entrada({

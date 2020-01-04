@@ -5,23 +5,25 @@ import 'package:chatarrera_flutter/tabs/salidas/salidas.dart';
 import 'package:chatarrera_flutter/tabs/materiales/materiales.dart';
 import 'package:chatarrera_flutter/tabs/entradas/entradas.dart';
 
+// TODO: Definir colores propios
+final appTheme = ThemeData.dark().copyWith();
+
 void main() {
   runApp(
     MaterialApp(
       title: "Chatarrera app",
-      home: MyHome(),
-      // TODO: Definir colores propios
-      theme: ThemeData.dark().copyWith(),
+      home: Main(),
+      theme: appTheme,
     ),
   );
 }
 
-class MyHome extends StatefulWidget {
+class Main extends StatefulWidget {
   @override
-  MyHomeState createState() => MyHomeState();
+  MainState createState() => MainState();
 }
 
-class MyHomeState extends State<MyHome> {
+class MainState extends State<Main> {
   int currentIndex = 0;
 
   final List<Widget> children = [

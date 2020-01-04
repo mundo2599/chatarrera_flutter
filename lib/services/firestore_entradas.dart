@@ -23,11 +23,17 @@ class FirestoreEntradas {
     DateTime fechaInicio,
     DateTime fechaFin,
   }) {
+    // se dejan solo dia mes y año
+    fechaInicio =
+        DateTime(fechaInicio.year, fechaInicio.month, fechaInicio.day);
 
-    if(fechaFin == null) {
-      fechaFin = fechaInicio.add(Duration(days: 1));
+    if (fechaFin != null)
       fechaFin = DateTime(fechaFin.year, fechaFin.month, fechaFin.day);
-    }
+    else
+      fechaFin = DateTime(fechaInicio.year, fechaInicio.month, fechaInicio.day);
+
+    // Se agrega un dia a fecha fin para hacer la query en menor que
+    fechaFin = fechaFin.add(Duration(days: 1));
 
     Query query = entradasRef;
     query = query.where(

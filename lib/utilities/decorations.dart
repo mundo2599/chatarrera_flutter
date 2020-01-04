@@ -1,3 +1,4 @@
+import 'package:chatarrera_flutter/main.dart';
 import 'package:flutter/material.dart';
 
 Border borderGris({
@@ -11,7 +12,7 @@ Border borderGris({
   if (all) left = rigth = top = bottom = true;
 
   BorderSide borderSide = BorderSide(
-    color: Colors.grey,
+    color: appTheme.dividerColor,
     width: width,
   );
 
@@ -22,8 +23,3 @@ Border borderGris({
     bottom: !bottom ? BorderSide.none : borderSide,
   );
 }
-
-BoxDecoration decorationButtons() => BoxDecoration(
-      border: Border.all(color: Colors.grey),
-      borderRadius: BorderRadius.all(Radius.circular(4.0)),
-    );
